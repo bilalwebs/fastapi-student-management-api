@@ -1,6 +1,8 @@
 
 # model.py
-from pydantic import BaseModel, EmailStr, Field
+import re
+
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 # Request Model
 
@@ -11,6 +13,37 @@ class Student(BaseModel):
     department: str
     email: EmailStr
     password: str = Field(min_length=8, max_length=100)
+
+    @field_validator("department")
+    @classmethod
+    def validate_department(cls, value):
+        allowed_departments = ["CS", "AI", "SE", "MBS"]
+        if value not in allowed_departments:
+            raise ValueError(
+                f"Department must be one of {allowed_departments}")
+        return value
+
+    @field_validator('password')
+    @classmethod
+    def valideate_password(cls, value):
+        if not re.search(r'[A-Z]', value):
+            raise ValueError("Password must contain at least one upper case.")
+
+        if not re.search(r'[a-z]', value):
+            raise ValueError("Password must contain at least one lower case.")
+
+        if not re.search(r'/d', value):
+            raise ValueError("Password must contain at least one number.")
+
+        return value
+
+    @field_validator('name')
+    @classmethod
+    def name_validate(cls, value):
+        if not re.fullmatch(r"[A-Za-z]+", value):
+            raise ValueError("Name must contain only letters and space.")
+
+        return value
 
 
 # Single Student Response

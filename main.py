@@ -174,7 +174,7 @@ async def update_student(student_id: int, student: Student):
             std['email'] = student.email
 
             return {
-                "message": "Student updae successfully",
+                "message": "Student update successfully",
                 "student": std
             }
 
