@@ -1,7 +1,7 @@
 # main.py
 
 from fastapi import FastAPI, HTTPException, status
-from model import Student
+from model import Student, StudentResponse, StudentCreateResponse, StudentUpdateResponse, StudentDeleteResponse
 from fake_data import students
 
 app = FastAPI()
@@ -12,7 +12,7 @@ async def read_root():
     return {"message": "Student Management API CRUD Application"}
 
 
-# GET ALL STUDENTS
+# ! GET ALL STUDENTS
 # @app.get("/students")
 # async def get_students(
 #         sort_by: str | None = None, order: str = "asc"):
@@ -31,7 +31,8 @@ async def read_root():
 #     return {"students": result}
 
 
-@app.get("/students")
+# @app.get("/students")
+@app.get("/students", response_model=list[StudentResponse])
 async def get_students(
     department: str | None = None,
     age: int | None = None,
@@ -104,15 +105,17 @@ async def get_students(
 
     result = result[skip: skip + limit]
 
-    return {"students": result}
+    # return {"students": result}
+    return result
 
 
-# POST (ADD STUDENT)
+# ! POST (ADD STUDENT)
 # @app.post("/students", status_code=201) # status_code=201 is perfect
 
 @app.post(
     "/students",
-    status_code=status.HTTP_201_CREATED  # Professional
+    status_code=status.HTTP_201_CREATED,  # Professional
+    response_model=StudentCreateResponse
 )
 async def create_student(student: Student):
 
@@ -133,12 +136,13 @@ async def create_student(student: Student):
     }
 
 
-# GET SINGLE STUDENT (BY ID)
-@app.get("/students/{student_id}")
+# ! GET SINGLE STUDENT (BY ID)
+@app.get("/students/{student_id}", response_model=StudentResponse)
 async def get_student(student_id: int):
     for std in students:
         if std["id"] == student_id:
-            return {"student": std}
+            # return {"student": std} not included response_model
+            return std  # include response model
 
     # Old Method
     # return {"error": "Student not found"}
@@ -152,12 +156,13 @@ async def get_student(student_id: int):
     )
 
 
-# PUT update Data
+# ! PUT update Data
 # @app.put("/students/{student_id}")
 
 @app.put(
     "/students/{student_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=StudentUpdateResponse
 )
 async def update_student(student_id: int, student: Student):
     for std in students:
@@ -165,6 +170,8 @@ async def update_student(student_id: int, student: Student):
             std['name'] = student.name
             std['age'] = student.age
             std['department'] = student.department
+            std['password'] = student.password
+            std['email'] = student.email
 
             return {
                 "message": "Student updae successfully",
@@ -182,13 +189,14 @@ async def update_student(student_id: int, student: Student):
         detail="Student not found."
     )
 
-# DELETE
+# ! DELETE
 # @app.delete("/students/{student_id}")
 
 
 @app.delete(
     "/students/{student_id}",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    response_model=StudentDeleteResponse
 )
 async def delete_student(student_id: int):
     for std in students:

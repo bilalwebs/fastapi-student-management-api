@@ -1,34 +1,36 @@
 # Student Management API
 
-A beginner-friendly Student Management REST API built with **FastAPI**. This project demonstrates CRUD operations, filtering, searching, sorting, pagination, proper HTTP status codes, and exception handling using in-memory fake data.
+A beginner-friendly Student Management REST API built with **FastAPI**. This project demonstrates CRUD operations, filtering, searching, sorting, pagination, proper HTTP status codes, exception handling, and **Response Models** using in-memory fake data.
 
 ---
 
 ## Features
 
-- Create Student
-- Get All Students
-- Get Student by ID
-- Update Student
-- Delete Student
-- Filter by Department
-- Filter by Age
-- Search by Name
-- Sort by ID, Name, Age, or Department
-- Ascending & Descending Sorting
-- Pagination (Skip & Limit)
-- HTTP Status Codes
-- HTTPException Handling
-- Pydantic Request Validation
+* Create Student
+* Get All Students
+* Get Student by ID
+* Update Student
+* Delete Student
+* Filter by Department
+* Filter by Age
+* Search by Name
+* Sort by ID, Name, Age, or Department
+* Ascending & Descending Sorting
+* Pagination (Skip & Limit)
+* HTTP Status Codes
+* HTTPException Handling
+* Pydantic Request Models
+* Pydantic Response Models
+* Hide Sensitive Data (Email & Password) using Response Models
 
 ---
 
 ## Tech Stack
 
-- Python
-- FastAPI
-- Pydantic
-- Uvicorn
+* Python
+* FastAPI
+* Pydantic
+* Uvicorn
 
 ---
 
@@ -49,13 +51,13 @@ A beginner-friendly Student Management REST API built with **FastAPI**. This pro
 Clone the repository
 
 ```bash
-git clone https://github.com/your-username/fastapi-student-management-api.git
+git clone https://github.com/your-username/student-management-api-crud.git
 ```
 
 Move into the project
 
 ```bash
-cd fastapi-student-management-api
+cd student-management-api-crud
 ```
 
 Create Virtual Environment
@@ -66,13 +68,13 @@ python -m venv venv
 
 Activate Virtual Environment
 
-Windows
+### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux / macOS
+### Linux / macOS
 
 ```bash
 source venv/bin/activate
@@ -94,13 +96,13 @@ uvicorn main:app --reload
 
 ## API Documentation
 
-Swagger UI
+### Swagger UI
 
 ```
 http://127.0.0.1:8000/docs
 ```
 
-ReDoc
+### ReDoc
 
 ```
 http://127.0.0.1:8000/redoc
@@ -168,7 +170,7 @@ GET /students?name=ali
 GET /students?sort_by=age
 ```
 
-Descending Order
+### Descending Order
 
 ```
 GET /students?sort_by=age&order=desc
@@ -180,7 +182,7 @@ GET /students?sort_by=age&order=desc
 GET /students?skip=0&limit=2
 ```
 
-### Combine Everything
+### Combined Query
 
 ```
 GET /students?department=CS&sort_by=age&order=desc&skip=0&limit=1
@@ -188,16 +190,35 @@ GET /students?department=CS&sort_by=age&order=desc&skip=0&limit=1
 
 ---
 
-## Sample Student
+## Sample Request
 
 ```json
 {
-    "id": 1,
     "name": "Ali",
     "age": 20,
-    "department": "CS"
+    "department": "CS",
+    "email": "ali@gmail.com",
+    "password": "Ali12345"
 }
 ```
+
+---
+
+## Sample Response
+
+```json
+{
+    "message": "Student created successfully",
+    "student": {
+        "id": 1,
+        "name": "Ali",
+        "age": 20,
+        "department": "CS"
+    }
+}
+```
+
+> **Note:** Email and Password are accepted in the request but are automatically hidden in the API response using **Response Models**.
 
 ---
 
@@ -212,22 +233,40 @@ GET /students?department=CS&sort_by=age&order=desc&skip=0&limit=1
 
 ---
 
+## Concepts Covered
+
+* FastAPI CRUD Operations
+* Path Parameters
+* Query Parameters
+* Filtering
+* Searching
+* Sorting
+* Pagination
+* Request Body Validation
+* Pydantic Models
+* Response Models
+* HTTPException
+* HTTP Status Codes
+
+---
+
 ## Future Improvements
 
-- Response Models
-- SQLAlchemy
-- SQLite Database
-- JWT Authentication
-- User Login & Registration
-- Dependency Injection
-- APIRouter
-- Modular Project Structure
-- Unit Testing
+* Pydantic Field Validation
+* SQLAlchemy ORM
+* SQLite / PostgreSQL
+* JWT Authentication
+* User Login & Registration
+* Dependency Injection
+* APIRouter
+* Modular Project Structure
+* Unit Testing
+* Docker Support
 
 ---
 
 ## Author
 
-Muhammad Bilal Hussain
+**Muhammad Bilal Hussain**
 
-Learning FastAPI step by step by building practical CRUD APIs.
+Learning FastAPI step by step by building practical and professional REST APIs.
