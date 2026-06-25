@@ -1,16 +1,16 @@
 
 # model.py
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 # Request Model
 
 
 class Student(BaseModel):
-    name: str
-    age: int
+    name: str = Field(min_length=3, max_length=50)
+    age: int = Field(ge=18, le=50)
     department: str
-    email: str
-    password: str
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=100)
 
 
 # Single Student Response
@@ -32,11 +32,15 @@ class StudentsResponse(BaseModel):
     students: list[StudentResponse]
 
 # PUT Response
+
+
 class StudentUpdateResponse(BaseModel):
     message: str
     student: StudentResponse
 
 # DELETE Response
+
+
 class StudentDeleteResponse(BaseModel):
     message: str
     student: StudentResponse
