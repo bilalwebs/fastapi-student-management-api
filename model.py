@@ -23,17 +23,21 @@ class Student(BaseModel):
                 f"Department must be one of {allowed_departments}")
         return value
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
-    def valideate_password(cls, value):
-        if not re.search(r'[A-Z]', value):
-            raise ValueError("Password must contain at least one upper case.")
+    def validate_password(cls, value):
 
-        if not re.search(r'[a-z]', value):
-            raise ValueError("Password must contain at least one lower case.")
+        if not re.search(r"[A-Z]", value):
+            raise ValueError("Password must contain at least one uppercase letter.")
 
-        if not re.search(r'/d', value):
+        if not re.search(r"[a-z]", value):
+            raise ValueError("Password must contain at least one lowercase letter.")
+
+        if not re.search(r"\d", value):
             raise ValueError("Password must contain at least one number.")
+
+        if not re.search(r"[@$!%*?&#]", value):
+            raise ValueError("Password must contain at least one special character.")
 
         return value
 

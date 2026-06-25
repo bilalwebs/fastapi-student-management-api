@@ -1,10 +1,19 @@
 # main.py
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from model import Student, StudentResponse, StudentCreateResponse, StudentUpdateResponse, StudentDeleteResponse
 from fake_data import students
 
 app = FastAPI()
+
+# dummpy function
+
+
+def verify_user():
+    return {
+        "username": "bilal",
+        "role": "admin"
+    }
 
 
 @app.get("/")
@@ -34,6 +43,8 @@ async def read_root():
 # @app.get("/students")
 @app.get("/students", response_model=list[StudentResponse])
 async def get_students(
+    user: dict = Depends(verify_user),
+
     department: str | None = None,
     age: int | None = None,
     name: str | None = None,
@@ -45,6 +56,7 @@ async def get_students(
     limit: int = 100
 
 ):
+    print(user)
     result = []
 
     # =========================================================
@@ -117,7 +129,7 @@ async def get_students(
     status_code=status.HTTP_201_CREATED,  # Professional
     response_model=StudentCreateResponse
 )
-async def create_student(student: Student):
+async def create_student(student: Student, user: dict = Depends(verify_user)):
 
     # model -> dict
     student_dict = student.model_dump()
@@ -130,6 +142,7 @@ async def create_student(student: Student):
 
     # add to list
     students.append(student_dict)
+    print(user)
     return {
         "message": "Student created successfully",
         "student": student_dict
@@ -138,7 +151,8 @@ async def create_student(student: Student):
 
 # ! GET SINGLE STUDENT (BY ID)
 @app.get("/students/{student_id}", response_model=StudentResponse)
-async def get_student(student_id: int):
+async def get_student(student_id: int, user: dict = Depends(verify_user)):
+    print(user)
     for std in students:
         if std["id"] == student_id:
             # return {"student": std} not included response_model
@@ -164,7 +178,8 @@ async def get_student(student_id: int):
     status_code=status.HTTP_200_OK,
     response_model=StudentUpdateResponse
 )
-async def update_student(student_id: int, student: Student):
+async def update_student(student_id: int, student: Student, user: dict = Depends(verify_user)):
+    print(user)
     for std in students:
         if std["id"] == student_id:
             std['name'] = student.name
@@ -198,7 +213,8 @@ async def update_student(student_id: int, student: Student):
     status_code=status.HTTP_200_OK,
     response_model=StudentDeleteResponse
 )
-async def delete_student(student_id: int):
+async def delete_student(student_id: int, user: dict = Depends(verify_user)):
+    print(user)
     for std in students:
         if std["id"] == student_id:
             students.remove(std)
