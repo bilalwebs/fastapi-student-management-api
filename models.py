@@ -11,12 +11,11 @@ class Student(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(nullable=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    age: Mapped[int] = mapped_column(nullable=True)
+    department: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    email: Mapped[str] = mapped_column(unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    department: Mapped[str] = mapped_column(nullable=False)
-
-    password: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(100), unique=True, nullable=False)

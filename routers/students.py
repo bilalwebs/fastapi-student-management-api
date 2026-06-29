@@ -6,6 +6,9 @@ from fake_data import students
 from model import Student, StudentCreateResponse, StudentDeleteResponse, StudentResponse, StudentUpdateResponse
 from dependencies import verify_user
 
+from sqlalchemy.orm import Session
+from database import get_db
+
 # router = APIRouter()
 router = APIRouter(
     prefix="/students",
@@ -35,6 +38,7 @@ router = APIRouter(
 # @app.get("/students")
 @router.get("", response_model=list[StudentResponse])
 async def get_students(
+    db: Session = Depends(get_db),
     user: dict = Depends(verify_user),
 
     department: str | None = None,
