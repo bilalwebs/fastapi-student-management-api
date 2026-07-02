@@ -2,7 +2,7 @@
 # model.py
 import re
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 
 # Request Model
 
@@ -28,24 +28,27 @@ class Student(BaseModel):
     def validate_password(cls, value):
 
         if not re.search(r"[A-Z]", value):
-            raise ValueError("Password must contain at least one uppercase letter.")
+            raise ValueError(
+                "Password must contain at least one uppercase letter.")
 
         if not re.search(r"[a-z]", value):
-            raise ValueError("Password must contain at least one lowercase letter.")
+            raise ValueError(
+                "Password must contain at least one lowercase letter.")
 
         if not re.search(r"\d", value):
             raise ValueError("Password must contain at least one number.")
 
         if not re.search(r"[@$!%*?&#]", value):
-            raise ValueError("Password must contain at least one special character.")
+            raise ValueError(
+                "Password must contain at least one special character.")
 
         return value
 
-    @field_validator('name')
+    @field_validator("name")
     @classmethod
     def name_validate(cls, value):
-        if not re.fullmatch(r"[A-Za-z]+", value):
-            raise ValueError("Name must contain only letters and space.")
+        if not re.fullmatch(r"[A-Za-z ]+", value):
+            raise ValueError("Name must contain only letters and spaces.")
 
         return value
 
@@ -56,6 +59,8 @@ class StudentResponse(BaseModel):
     name: str
     age: int
     department: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # POST Response
