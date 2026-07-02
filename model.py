@@ -71,6 +71,11 @@ class StudentCreateResponse(BaseModel):
 
 # Wrapper Response Model (GET ALL)
 class StudentsResponse(BaseModel):
+    total: int
+    skip: int
+    limit: int
+    current_page: int
+    total_page: int
     students: list[StudentResponse]
 
 # PUT Response

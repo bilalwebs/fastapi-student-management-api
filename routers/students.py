@@ -1,11 +1,11 @@
 
 
 # routers/students.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fake_data import students
 # API Validation
 from model import (Student, StudentCreateResponse,
-                   StudentDeleteResponse, StudentResponse, StudentUpdateResponse)
+                   StudentDeleteResponse, StudentResponse, StudentsResponse, StudentUpdateResponse)
 from dependencies import verify_user
 
 # Database Table
@@ -125,7 +125,7 @@ router = APIRouter(
 #     # return {"students": result}
 #     return result
 
-@router.get("", response_model=list[StudentResponse])
+@router.get("", response_model=StudentsResponse)
 async def get_students(db: Session = Depends(get_db),
                        user: dict = Depends(verify_user),
 
@@ -134,11 +134,13 @@ async def get_students(db: Session = Depends(get_db),
                        age: int | None = None,
                        department: str | None = None,
 
-                       skip: int = 0,
-                       limit: int = 100,
+                       # ge=0 means greater than or equal to 0
+                       skip: int = Query(0, ge=0),
+                       # ge=1 means greater than or equal to 1, le=100 means less than or equal to 100
+                       limit: int = Query(10, ge=1, le=100),
 
                        sort_by: str | None = None,
-                       order: str = "asc"
+                       order: str = Query("asc", regex="^(asc|desc)$")
                        ):
     # students = db.query(StudentModel).all()
     # return students
@@ -177,12 +179,26 @@ async def get_students(db: Session = Depends(get_db),
         else:
             query = query.order_by(asc(sort_column))
 
-    # limit and skip for pagination
+    # Total students after filtering
+    total = query.count()
 
+    # Pagination
     query = query.offset(skip).limit(limit)
 
-    students = query.offset(skip).limit(limit).all()
-    return students
+    students = query.all()
+
+    current_page = (skip // limit) + 1
+
+    total_page = (total + limit - 1) // limit  # Ceiling division
+
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "current_page": current_page,
+        "total_pages": total_page,
+        "students": students
+    }
 
 
 # ! POST (ADD STUDENT)
@@ -220,6 +236,17 @@ async def create_student(
     db: Session = Depends(get_db),
     user: dict = Depends(verify_user)
 ):
+    # Check duplicate email
+    existing_student = db.query(StudentModel).filter(
+        StudentModel.email == student.email
+    ).first()
+
+    if existing_student:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists."
+        )
+
     student_db = StudentModel(
         name=student.name,
         age=student.age,
@@ -333,6 +360,16 @@ async def update_student(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Student not found."
+        )
+
+    existing_student = db.query(StudentModel).filter(
+        StudentModel.email == student.email,
+        StudentModel.id != student_id  # Exclude the current student from the check
+    ).first()
+    if existing_student:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists."
         )
 
     student_db.name = student.name
